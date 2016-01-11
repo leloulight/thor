@@ -24,25 +24,15 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <math.h>
-#include <string.h>
-#include <memory.h>
-#include <assert.h>
+#if !defined(_WT_MATRIX_H_)
+#define _WT_MATRIX_H_
 
 #include "global.h"
-#include "strings.h"
-#include "snr.h"
-#include "mainenc.h"
-#include "putbits.h"
-#include "putvlc.h"
-#include "transform.h"
-#include "common_block.h"
 
-int write_delta_qp(stream_t *stream, int delta_qp);
-void write_mv(stream_t *stream,mv_t *mv,mv_t *mvp);
-void write_coeff(stream_t *stream,int16_t *coeff,int size,int type);
-int write_block(stream_t *stream,encoder_info_t *encoder_info,block_info_t *block_info, block_param_t *block_param);
-void write_super_mode(stream_t *stream, encoder_info_t *encoder_info, block_info_t *block_info, block_param_t *block_param, int split_flag);
+void alloc_wmatrices(unsigned int* matrix[52][3][2][TR_SIZE_RANGE]);
+void free_wmatrices(unsigned int* matrix[52][3][2][TR_SIZE_RANGE]);
+
+void make_wmatrices(unsigned int* wmatrix[52][3][2][TR_SIZE_RANGE], unsigned int* iwmatrix[52][3][2][TR_SIZE_RANGE]);
+
+
+#endif

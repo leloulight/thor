@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "temporal_interp.h"
 #include "../common/simd.h"
 #include "rc.h"
+#include "wt_matrix.h"
 
 // Coding order to display order
 static const int cd1[1] = {0};
@@ -95,6 +96,7 @@ int main(int argc, char **argv)
   double bit_rate_in_kbps;
   enc_params *params;
   encoder_info_t encoder_info;
+
   int y4m_output;
   // Keep track of last P frame for using the right references for the tail of a sequence in re-ordered modes
   int last_PorI_frame;
@@ -192,6 +194,10 @@ int main(int argc, char **argv)
 
   encoder_info.deblock_data = (deblock_data_t *)malloc((height/MIN_PB_SIZE) * (width/MIN_PB_SIZE) * sizeof(deblock_data_t));
 
+  alloc_wmatrices(encoder_info.wmatrix);
+  alloc_wmatrices(encoder_info.iwmatrix);
+
+  make_wmatrices(encoder_info.wmatrix, encoder_info.iwmatrix);
 
   /* Write sequence header */ //TODO: Separate function for sequence header
   start_bits = get_bit_pos(&stream);
@@ -206,6 +212,7 @@ int main(int argc, char **argv)
   putbits(1,params->clpf,&stream);
   putbits(1,params->use_block_contexts,&stream);
   putbits(1,params->enable_bipred,&stream);
+  putbits(1,params->qmtx,&stream);
 
   end_bits = get_bit_pos(&stream);
   num_bits = end_bits-start_bits;
@@ -644,6 +651,9 @@ int main(int argc, char **argv)
       fclose(cumu_fp);
     }
   }
+
+  free_wmatrices(encoder_info.wmatrix);
+  free_wmatrices(encoder_info.iwmatrix);
 
   close_yuv_frame(&orig);
   for (int i=0; i<MAX_REORDER_BUFFER; ++i) {
